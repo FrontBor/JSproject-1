@@ -1,90 +1,54 @@
-'use strict'
+window.addEventListener('DOMContentLoaded', function() {
 
-window.addEventListener('DOMContentLoaded', () => {
+    // Tabs
+    
+	let tabs = document.querySelectorAll('.tabheader__item'),
+		tabsContent = document.querySelectorAll('.tabcontent'),
+		tabsParent = document.querySelector('.tabheader__items');
 
-    // let tabs = document.querySelectorAll('.tabheader__item'),
-    //     tabsContent = document.querySelectorAll('.tabcontent'),
-    //     tabsParent = document.querySelector('.tabheader__item');
+	function hideTabContent() {
+        
+        tabsContent.forEach(item => {
+            item.classList.add('hide');
+            item.classList.remove('show', 'fade');
+        });
 
-    // // Скрытие табов
-    // function hideTabContent() {
-    //         tabsContent.forEach(item => {
-    //             item.style.display = 'none';
-    //             item.classList.add('hide');
-    //             item.classList.remove('show', 'fade');
-    //         }); 
+        tabs.forEach(item => {
+            item.classList.remove('tabheader__item_active');
+        });
+	}
 
-    //         tabs.forEach(item => {
-    //             item.classList.remove('tabheader__item_active');
-    //         });
-    // }
-
-    // // Показывает табы
-    // function showTabContent(i = 0) {
-    //     tabsContent[i].style.display = 'block';
-    //     tabs[i].classList.add('tabheader__item_active');
-
-    // }
-
-    // hideTabContent();
-    // showTabContent();
-
-    // // Делегирование событий, назначение клика
-
-    // tabsParent.addEventListener('click', (event) => {
-    //     const target = event.target;
-
-    //     if (target && target.classList.contains('tabheader__item')) {
-    //         tabs.forEach(( item, i ) => {
-    //             if (target == item) {
-    //                 hideTabContent();
-    //                 showTabContent(i); 
-    //             }
-    //         });
-    //     }
-    // });
-
-
-
-    // Табы, вариант через стрелочную функцию!!!
-
-    const tabItems = document.querySelectorAll('.tabheader__item')
-    const contentItems = document.querySelectorAll('.tabcontent')
-
-    const findClearActiveClass = (elements, className = 'tabheader__item_active') => {
-        Array.from(elements).find(item => item.classList.remove(`${ className }`))
+	function showTabContent(i = 0) {
+        tabsContent[i].classList.add('show', 'fade');
+        tabsContent[i].classList.remove('hide');
+        tabs[i].classList.add('tabheader__item_active');
     }
+    
+    hideTabContent();
+    showTabContent();
 
-    const setActiveClass = (element, index, className = 'tabheader__item_active') => {
-        element[index].classList.add(`${ className }`)
+	tabsParent.addEventListener('click', function(event) {
+		const target = event.target;
+		if(target && target.classList.contains('tabheader__item')) {
+            tabs.forEach((item, i) => {
+                if (target == item) {
+                    hideTabContent();
+                    showTabContent(i);
+                }
+            });
+		}
+    });
+    
+    // Timer
 
-    }
+    const deadline = '2020-05-11';
 
-    const checkoutTabs = (item, index) => {
-        item.addEventListener('click', () => {
-            if (item.classList.contains('tabheader__item_active')) return
-
-            const currentItem = index
-
-            findClearActiveClass(tabItems)
-            findClearActiveClass(contentItems)
-
-            setActiveClass(tabItems, currentItem)
-            setActiveClass(contentItems, currentItem)
-        })
-    }
-    tabItems.forEach(checkoutTabs)
-
-    // Таймер
-
-    const deadline = '2021-12-15';
-
-    function getTimerRemaiding(endtime) {
+    function getTimeRemaining(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()),
-            days = Math.floor(t / (1000 * 60 * 60 * 24)),
-            hours = Math.floor((t / (1000 * 60 * 60) % 24)),
-            minutes = Math.floor((t / 1000 / 60) % 60),
-            seconds = Math.floor((t / 1000) % 60);
+            days = Math.floor( (t/(1000*60*60*24)) ),
+            seconds = Math.floor( (t/1000) % 60 ),
+            minutes = Math.floor( (t/1000/60) % 60 ),
+            hours = Math.floor( (t/(1000*60*60) % 24) );
 
         return {
             'total': t,
@@ -93,42 +57,39 @@ window.addEventListener('DOMContentLoaded', () => {
             'minutes': minutes,
             'seconds': seconds
         };
+    }
 
-        //   function getZero(num) {
-        //       if (num >= 0 && num < 10) {
-        //           return `0${num}`;
-        //       } else {
-        //         return num;
-        //       }
-        //   }
-
-
+    function getZero(num){
+        if (num >= 0 && num < 10) { 
+            return '0' + num;
+        } else {
+            return num;
+        }
     }
 
     function setClock(selector, endtime) {
+
         const timer = document.querySelector(selector),
-            days = document.querySelector('#days'),
-            hours = document.querySelector('#hours'),
-            minutes = document.querySelector('#minutes'),
-            seconds = document.querySelector('#seconds'),
+            days = timer.querySelector("#days"),
+            hours = timer.querySelector('#hours'),
+            minutes = timer.querySelector('#minutes'),
+            seconds = timer.querySelector('#seconds'),
             timeInterval = setInterval(updateClock, 1000);
 
         updateClock();
 
         function updateClock() {
-            const t = getTimerRemaiding(endtime);
+            const t = getTimeRemaining(endtime);
 
-            days.innerHTML = t.days;
-            hours.innerHTML = t.hours;
-            minutes.innerHTML = t.minutes;
-            seconds.innerHTML = t.seconds;
+            days.innerHTML = getZero(t.days);
+            hours.innerHTML = getZero(t.hours);
+            minutes.innerHTML = getZero(t.minutes);
+            seconds.innerHTML = getZero(t.seconds);
 
             if (t.total <= 0) {
                 clearInterval(timeInterval);
             }
-
         }
-
     }
 
     setClock('.timer', deadline);
@@ -146,16 +107,16 @@ window.addEventListener('DOMContentLoaded', () => {
     function closeModal() {
         modal.classList.add('hide');
         modal.classList.remove('show');
-        // document.body.style.overflow = '';
+        document.body.style.overflow = '';
     }
 
     function openModal() {
         modal.classList.add('show');
         modal.classList.remove('hide');
-        // document.body.style.overflow = 'hidden';
-        // clearInterval(modalTimerId);
+        document.body.style.overflow = 'hidden';
+        clearInterval(modalTimerId);
     }
-
+    
     modalCloseBtn.addEventListener('click', closeModal);
 
     modal.addEventListener('click', (e) => {
@@ -165,7 +126,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('keydown', (e) => {
-        if (e.code === "Escape" && modal.classList.contains('show')) {
+        if (e.code === "Escape" && modal.classList.contains('show')) { 
             closeModal();
         }
     });
@@ -181,8 +142,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     window.addEventListener('scroll', showModalByScroll);
 
-
-
     // Используем классы для создание карточек меню
 
     class MenuCard {
@@ -194,19 +153,25 @@ window.addEventListener('DOMContentLoaded', () => {
             this.price = price;
             this.classes = classes;
             this.parent = document.querySelector(parentSelector);
-            this.transfer = 100;
-            this.changeToUAH();
+            this.transfer = 27;
+            this.changeToUAH(); 
         }
 
         changeToUAH() {
-            this.price = this.price * this.transfer;
+            this.price = this.price * this.transfer; 
         }
 
         render() {
             const element = document.createElement('div');
-            this.classes.forEach(className => element.classList.add(className));
+
+            if (this.classes.length === 0) {
+                this.classes = "menu__item";
+                element.classList.add(this.classes);
+            } else {
+                this.classes.forEach(className => element.classList.add(className));
+            }
+
             element.innerHTML = `
-            <div class="menu__item">
                 <img src=${this.src} alt=${this.alt}>
                 <h3 class="menu__item-subtitle">${this.title}</h3>
                 <div class="menu__item-descr">${this.descr}</div>
@@ -215,7 +180,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     <div class="menu__item-cost">Цена:</div>
                     <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
                 </div>
-            </div>
             `;
             this.parent.append(element);
         }
@@ -235,7 +199,7 @@ window.addEventListener('DOMContentLoaded', () => {
         "post",
         'Меню "Постное"',
         'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-        16,
+        14,
         ".menu .container"
     ).render();
 
@@ -247,62 +211,5 @@ window.addEventListener('DOMContentLoaded', () => {
         21,
         ".menu .container"
     ).render();
-
-
-
-
-    // Forms
-
-    const forms = document.querySelectorAll('form');
-
-    const message = {
-        loading: 'Загрузка',
-        success: 'Спасибо! Скоро мы с вами свяжемся',
-        failure: 'Что-то пошло не так'
-    };
-
-    forms.forEach(item => {
-        postData(item);
-    });
-
-    function postData(form) {
-        form.addEventListener('submite', (e) => {
-            e.preventDefault();
-
-            const statusMessage = document.createElement('div');
-            statusMessage.classList.add('status');
-            statusMessage.textContent = message.loading;
-            form.append(statusMessage);
-
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-
-            request.setRequestHeader('Content-type', 'application/json');
-            const formData = new FormData(form);
-
-            const object = {};
-            formData.forEach(function (value, key) {
-                object[key] = value;
-            });
-
-            const json = JSON.stringify(object)
-
-            request.send(json);
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
-                    statusMessage.textContent = message.success;
-                    form.reset();
-                    setTimeout(() => {
-                        statusMessage.remove();
-                    }, 2000);
-                } else {
-                    statusMessage.textContent = message.failure;
-                }
-            });
-        });
-
-    }
 
 });
